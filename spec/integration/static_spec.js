@@ -11,7 +11,15 @@ describe("routes : static", () => {
       });
     });
   });
-  describe("GET /marco", () => {
+  describe("Get /about", () => {
+    it("should return status code 200 and have 'About Us' in the body of the response", () => {
+      request.get(base + "/about", (error, response, body) => {
+        expect(response.statusCode).toBe(200);
+        expect(body).toContain("About Us");
+      });
+    });
+  });
+  /*describe("GET /marco", () => {
     it("should return status code 200", done => {
       request.get(base + "/marco", (error, response, body) => {
         expect(response.statusCode).toBe(200);
@@ -19,5 +27,5 @@ describe("routes : static", () => {
         done();
       });
     });
-  });
+  });*/
 });
