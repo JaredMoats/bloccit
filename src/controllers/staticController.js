@@ -5,4 +5,5 @@ module.exports = {
   about(request, response, next) {
     response.render("static/about", {title: "About Us"});
   }
+
 }
