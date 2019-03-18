@@ -14,10 +14,10 @@ module.exports = (sequelize, DataTypes) => {
       foreignKey: "topicId",
       as: "rules",
     });
+    Topic.hasMany(models.Advertisement, {
+      foreignKey: "topicId",
+      as: "advertisements",
+    });
   };
-  Topic.hasMany(models.Advertisement, {
-    foreignKey: "topicId",
-    as: "advertisements",
-  });
   return Topic;
 };
