@@ -29,15 +29,6 @@ describe("Topic", () => {
           this.post1 = post;
           done();
         });
-        Post.create({
-          title: "Am I allowed to like salads?",
-          body: "I'm vegan, guys. I'm surrounded by meat eaters. Am I loved here?",
-
-          topicId: this.topic.id
-        }).then(post => {
-          this.post2 = post;
-          done();
-        });
       })
       .catch(error => {
         console.log(error);
@@ -67,9 +58,6 @@ describe("Topic", () => {
       .then(associatedPosts => {
         expect(associatedPosts[0].title).toBe("Bacon is great");
         expect(associatedPosts[0].body).toBe("Dude, I'll tell you about bacon if I WANT to tell you about bacon");
-
-        expect(associatedPosts[1].title).toBe("Am I allowed to like salads?");
-        expect(associatedPosts[1].body).toBe("I'm vegan, guys. I'm surrounded by meat eaters. Am I loved here?");
         done();
       })
       .catch(error => {
