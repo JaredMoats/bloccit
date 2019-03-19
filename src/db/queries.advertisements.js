@@ -25,13 +25,13 @@ module.exports = {
   getAdvertisement(id, callback) {
     return Advertisement.findById(id)
     .then(advertisement => {
-      callback(null, topic);
+      callback(null, advertisement);
     })
     .catch(error => {
       callback(error);
     });
   },
-  deleteTopic(id, callback) {
+  deleteAdvertisement(id, callback) {
     return Advertisement.destroy({
       where: { id }
     })
@@ -53,7 +53,7 @@ module.exports = {
         fields: Object.keys(updatedAdvertisement)
       })
       .then(() => {
-        callback(null, topic);
+        callback(null, advertisement);
       })
       .catch(error => {
         callback(error);
