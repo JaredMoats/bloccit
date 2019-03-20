@@ -25,12 +25,15 @@ module.exports = {
   show(request, response, next) {
     flairQueries.getFlair(request.params.id, (error, flair) => {
       if(error || flair == null) {
+        console.log(`request.params.id: ${request.params.id}`);
+        console.log("Your flair error: " + error);
+        console.log("log of flair object: " + flair);
         response.redirect(404, "/");
       } else {
         response.render("flairs/show", {
           flair,
           topicId: request.params.topicId,
-          postId: request.params.postId 
+          postId: request.params.postId
         });
       }
     })
