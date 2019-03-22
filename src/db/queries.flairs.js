@@ -20,5 +20,34 @@ module.exports = {
     .catch(error => {
       callback(error);
     });
+  },
+  deleteFlair(id, callback){
+    return Flair.destroy({
+      where: { id }
+    })
+    .then(deletedRecordsCount => {
+      callback(null, deletedRecordsCount)
+    })
+    .catch(error => {
+      callback(error);
+    });
+  },
+  updateFlair(id, updatedFlair, callback) {
+    return Flair.findById(id)
+    .then(flair => {
+      if(!flair) {
+        return callback("Flair not found");
+      }
+
+      flair.update(updatedFlair, {
+        fields: Object.keys(updatedFlair)
+      })
+      .then(() => {
+        callback(null, post);
+      })
+      .catch(error => {
+        callback(error);
+      });
+    });
   }
 }

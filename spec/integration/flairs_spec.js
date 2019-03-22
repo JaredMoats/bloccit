@@ -82,10 +82,71 @@ describe("routes : flairs", () => {
   /* Test to show the selected flair */
   describe("GET /posts/:postId/flairs/:id", () => {
     it("should render a view with selected flair", done => {
-      request.get(`${base}/${this.topic.id}/posts/${this.post.id}/flairs/:id`, (error, response, body) => {
+      request.get(`${base}/${this.topic.id}/posts/${this.post.id}/flairs/${this.flair.id}`, (error, response, body) => {
         expect(error).toBeNull();
         expect(body).toContain("Truth teller");
         done();
+      });
+    });
+  });
+  /* Test to delete the selected flair */
+  describe("POST /posts/:postId/flairs/:id/destroy", () => {
+    it("should delete the flair with the associated ID", done => {
+      /* Make sure the flair is in the database */
+      expect(this.flair.id).toBe(1);
+
+      request.post(`${base}/${this.topic.id}/posts/${this.post.id}/flairs/${this.flair.id}/destroy`, (error, response, body) => {
+        /* Confirm that the flair was deleted when the destroy endpoint is visited */
+        Flair.findById(1)
+        .then(flair => {
+          expect(error).toBeNull();
+          expect(flair).toBeNull();
+          done();
+        })
+      });
+    });
+  });
+  describe("GET /posts/:postId/flairs/:id/edit", () => {
+    it("should render a view with an edit flair form", done => {
+      request.get(`${base}/${this.topic.id}/posts/${this.post.id}/flairs/${this.flair.id}/edit`, (error, response, body) => {
+        expect(error).toBeNull();
+        expect(body).toContain("Edit Flair");
+        expect(body).toContain("Truth teller");
+        done();
+      });
+    });
+  });
+  describe("POST /posts/:postId/flairs/:id/update", () => {
+    it("should return status code 302", done => {
+      request.post({
+        url: `${base}/${this.topic.id}/posts/${this.post.id}/flairs/${this.flair.id}/update`,
+        form: {
+          name: "Truth teller",
+          color: "blue"
+        }
+      }, (error, response, body) => {
+        expect(response.statusCode).toBe(302);
+        done();
+      });
+    });
+    it("should update the flair with the given values", done => {
+      const options = {
+        url: `${base}/${this.topic.id}/posts/${this.post.id}/flairs/${this.flair.id}/update`,
+        form: {
+          name: "Lie teller",
+          color: "hot pink"
+        }
+      };
+      request.post(options, (error, response, body) => {
+        expect(error).toBeNull();
+
+        Flair.findOne({
+          where: {id: this.flair.id}
+        })
+        .then(flair => {
+          expect(flair.name).toBe("Lie teller");
+          done();
+        });
       });
     });
   });

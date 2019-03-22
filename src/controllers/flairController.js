@@ -14,7 +14,7 @@ module.exports = {
       topicId: request.params.topicId,
       postId: request.params.postId
     };
-    flairQueries.addFlair(newFlair, (error, post) => {
+    flairQueries.addFlair(newFlair, (error, flair) => {
       if(error) {
         response.redirect(500, "/flairs/new");
       } else {
@@ -37,5 +37,32 @@ module.exports = {
         });
       }
     })
+  },
+  destroy(request, response, next) {
+    flairQueries.deleteFlair(request.params.id, (error, deletedRecordsCount) => {
+      if(error) {
+        response.redirect(500, `/posts/${request.params.postId}/flairs/${request.params.id}`);
+      } else {
+        response.redirect(303, `/posts/${request.params.postId}`)
+      }
+    });
+  },
+  edit(request, response, next) {
+    flairQueries.getFlair(request.params.id, (error, flair) => {
+      if(error || flair == null) {
+        response.redirect(404, "/");
+      } else {
+        response.render("flairs/edit", { flair });
+      }
+    });
+  },
+  update(request, response, next) {
+    flairQueries.updateFlair(request.params.id, request.body, (error, flair) => {
+      if(error || flair == null) {
+        response.redirect(404, `/posts/${request.params.postId}/flairs/${request.params.id}/edit`);
+      } else {
+        response.redirect(`/posts/${request.params.postId}/flairs/${request.params.id}`);
+      }
+    });
   }
 }
