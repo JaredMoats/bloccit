@@ -1,6 +1,7 @@
 const request = require("request");
 const server = require("../../src/server");
 const base = `http://localhost:3000/topics`;
+const localhost = `http://localhost:3000`;
 
 const sequelize = require("../../src/db/models/index").sequelize;
 const Topic = require("../../src/db/models").Topic;
@@ -57,7 +58,7 @@ describe("routes : flairs", () => {
   describe("POST /posts/:postId/flairs/create", () => {
     it("should create a new flair and redirect", done => {
       const option = {
-        url: `${base}/${this.topic.id}/posts/${this.post.id}/flairs/create`,
+        url: `http://localhost:3000/posts/${this.post.id}/flairs/create`,
         form: {
           name: "Random flair",
           color: "pink"
@@ -108,7 +109,7 @@ describe("routes : flairs", () => {
   });
   describe("GET /posts/:postId/flairs/:id/edit", () => {
     it("should render a view with an edit flair form", done => {
-      request.get(`${base}/${this.topic.id}/posts/${this.post.id}/flairs/${this.flair.id}/edit`, (error, response, body) => {
+      request.get(`${localhost}/posts/${this.post.id}/flairs/${this.flair.id}/edit`, (error, response, body) => {
         expect(error).toBeNull();
         expect(body).toContain("Edit Flair");
         expect(body).toContain("Truth teller");

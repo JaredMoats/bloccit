@@ -16,9 +16,10 @@ module.exports = {
     };
     flairQueries.addFlair(newFlair, (error, flair) => {
       if(error) {
+        console.log("flairQueries error: Your newFlair: " + newFlair.name);
         response.redirect(500, "/flairs/new");
       } else {
-        response.redirect(303, `/posts/${newFlair.postId}/flairs/${flair.id}`)
+        response.redirect(303, `/topics/${newFlair.topicId}/posts/${newFlair.postId}/flairs/${flair.id}`);
       }
     });
   },
@@ -30,11 +31,7 @@ module.exports = {
         console.log("log of flair object: " + flair);
         response.redirect(404, "/");
       } else {
-        response.render("flairs/show", {
-          flair,
-          topicId: request.params.topicId,
-          postId: request.params.postId
-        });
+        response.render("flairs/show", {flair});
       }
     })
   },

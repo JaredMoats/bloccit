@@ -13,7 +13,7 @@
       <%= flair.name %>
     </h1>
     <a href="/posts/<%= flair.postId %>/flairs/<%= flair.id %>/edit" class="btn btn-warning">Edit</a>
-    <form style="display:initial" action="/topics/<%= flair.topicId %>/flairs/<%= flair.id %>/destroy" method="post">
+    <form style="display:initial" action="/posts/<%= flair.postId %>/flairs/<%= flair.id %>/destroy" method="post">
       <button type="submit" class="btn btn-danger">Delete</button>
     </form>
 
