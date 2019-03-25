@@ -35,15 +35,16 @@ module.exports = {
   updateFlair(id, updatedFlair, callback) {
     return Flair.findById(id)
     .then(flair => {
+      console.log(flair);
       if(!flair) {
         return callback("Flair not found");
       }
-
-      flair.update(updatedFlair, {
+      console.log(updatedFlair);
+      return flair.update(updatedFlair, {
         fields: Object.keys(updatedFlair)
       })
       .then(() => {
-        callback(null, post);
+        callback(null, flair);
       })
       .catch(error => {
         callback(error);

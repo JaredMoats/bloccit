@@ -71,6 +71,27 @@ describe("routes : posts", () => {
         });
       })
     });
+    /*it("should not create a new post that fails validation", done => {
+      const options = {
+        url: `${base}/${this.topic.id}/posts/create`,
+        form: {
+          title: "a",
+          body: "b"
+        }
+      };
+      request.post(options, (error, response, body) => {
+        //confirm that the post passed in wasn't created
+        Post.findOne({where: {title: "a"}})
+        .then(post => {
+          expect(post).toBeNull();
+          done();
+        })
+        .catch(error => {
+          console.log(error);
+          done();
+        });
+      });
+    });*/
   });
   describe("GET /topics/:topicId/posts/:id", () => {
     it("should render a view with the selected post", done => {

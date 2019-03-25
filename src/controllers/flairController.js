@@ -56,10 +56,17 @@ module.exports = {
   update(request, response, next) {
     flairQueries.updateFlair(request.params.id, request.body, (error, flair) => {
       if(error || flair == null) {
-        response.redirect(404, `/posts/${request.params.postId}/flairs/${request.params.id}/edit`);
+        console.log(flair);
+        //response.redirect(404, `/posts/${request.params.postId}/flairs/${request.params.id}/edit`);
+        response.redirect(request.headers.referer);
       } else {
-        response.redirect(`/posts/${request.params.postId}/flairs/${request.params.id}`);
+        //response.redirect(`/posts/${request.params.postId}/flairs/${request.params.id}`);
+        response.redirect(request.headers.referer);
       }
     });
   }
 }
+
+//http://localhost:3000/topics/1/posts/2/flairs/1
+//http://localhost:3000/posts/2/flairs/1/edit
+//http://localhost:3000/posts/2/flairs/1
