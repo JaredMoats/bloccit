@@ -67,7 +67,27 @@ describe("routes : topics", () => {
         });
       });
     });
-
+    it("should not create a new topic that fails validation", done => {
+      const validateOptions = {
+        url: `${base}/create`,
+        form: {
+          title: "jal",
+          description: "b"
+        }
+      };
+      request.post(validateOptions, (error, response, body) => {
+        //confirm that the topic passed in wasn't created
+        Topic.findOne({where: {title: "jal"}})
+        .then(topic => {
+          expect(topic).toBeNull();
+          done();
+        })
+        .catch(error => {
+          console.log(error);
+          done();
+        });
+      });
+    });
   });
   describe("GET /topics/:id", () => {
     it("should render a view with the selected topic", done => {
