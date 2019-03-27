@@ -29,5 +29,22 @@ module.exports = {
     } else {
       return next();
     }
+  },
+  validateUsers(request, response, next) {
+    if(request.method === "POST") {
+      request.checkBody("email", "must be valid").isEmail();
+      request.checkBody("password", "must be at least 6 characters long").isLength({ min: 6 });
+      request.checkBody("passwordConfirmation", "must match password provided").optional().matches(request.body.password);
+    }
+
+    const errors = request.validationErrors();
+
+    if(errors) {
+      request.flash("error", errors);
+      return response.redirect(request.headers.referer);
+    } else {
+      return next();
+    }
+
   }
 }
