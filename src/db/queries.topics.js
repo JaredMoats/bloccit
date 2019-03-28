@@ -1,5 +1,6 @@
 const Topic = require("./models").Topic;
 const Post = require("./models").Post;
+const Authorizer = require("../policies/topic");
 
 module.exports = {
   getAllTopics(callback) {
@@ -37,33 +38,48 @@ module.exports = {
       callback(error);
     });
   },
-  deleteTopic(id, callback) {
-    return Topic.destroy({
-      where: {id}
-    })
+  deleteTopic(request, callback) {
+    return Topic.findById(request.params.id)
     .then(topic => {
-      callback(null, topic);
+      const authorized = new Authorizer (request.user, topic).destroy();
+
+      if(authorized) {
+        topic.destroy()
+        .then(response => {
+          callback(null, topic);
+        });
+      } else {
+        request.flash("notice", "You are not authorized to do that");
+        callback(401);
+      }
     })
     .catch(error => {
       callback(error);
     });
   },
-  updateTopic(id, updatedTopic, callback) {
-    return Topic.findById(id)
+  updateTopic(request, updatedTopic, callback) {
+    return Topic.findById(request.params.id)
     .then(topic => {
       if(!topic) {
         return callback("Topic not found");
       }
 
-      topic.update(updatedTopic, {
-        fields: Object.keys(updatedTopic)
-      })
-      .then(() => {
-        callback(null, topic);
-      })
-      .catch(error => {
-        callback(error);
-      });
+      const authorized = new Authorizer(request.user, topic).update();
+
+      if(authorized) {
+        topic.update(updatedTopic, {
+          fields: Object.keys(updatedTopic)
+        })
+        .then(() => {
+          callback(null, topic);
+        })
+        .catch(error => {
+          callback(error);
+        })
+      } else {
+        request.flash("notice", "You are not authorized to do that.");
+        callback("Forbidden");
+      }
     });
   }
 };
