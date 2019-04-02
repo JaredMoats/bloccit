@@ -4,12 +4,20 @@ module.exports = class ApplicationPolicy {
     this.record = record;
   }
 
+  _isMember() {
+    return this.user && this.user.role === "member";
+  }
+
   _isOwner() {
     return this.record && (this.record.userId == this.user.id);
   }
 
+  _isTrue() {
+    return true;
+  }
+
   _isAdmin() {
-    return this.user && this.user.role == "admin";
+    return this.user && this.user.role === 'admin';
   }
 
   new() {

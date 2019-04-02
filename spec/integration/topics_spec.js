@@ -30,13 +30,23 @@ describe("routes : topics", () => {
   describe("admin user performing CRUD actions for Topic", () => {
 
     beforeEach((done) => {  // before each suite in admin context
-      request.get({         // mock authentication
-        url: "http://localhost:3000/auth/fake",
-        form: {
-          role: "admin"     // mock authenticate as admin user
-        }
-      });
-      done();
+      User.create({
+        email: "admin@example.com",
+        password: "123456",
+        role: "admin"
+      })
+      .then(user => {
+        request.get({
+          url: "http://localhost:3000/auth/fake",
+          form: {
+            role: user.role,
+            userId: user.id,
+            email: user.email
+          }
+        }, (error, response, body) => {
+          done();
+        });
+      })
     });
 
     describe("GET /topics", () => {
@@ -170,13 +180,23 @@ describe("routes : topics", () => {
   describe("member user performing CRUD actions for Topic", () => {
 
     beforeEach((done) => {  // before each suite in admin context
-      request.get({
-        url: "http://localhost:3000/auth/fake",
-        form: {
-          role: "member"
-        }
-      });
-      done();
+      User.create({
+        email: "user@example.com",
+        password: "123456",
+        role: "member"
+      })
+      .then(user => {
+        request.get({
+          url: "http://localhost:3000/auth/fake",
+          form: {
+            role: user.role,
+            userId: user.id,
+            email: user.email
+          }
+        }, (error, response, body) => {
+          done();
+        });
+      })
     });
 
     describe("GET /topics", () => {
