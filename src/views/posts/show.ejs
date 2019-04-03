@@ -19,6 +19,7 @@
     </form>
     <p>
       <%= post.body %>
+
       <hr>
 
       <h1>Flairs</h1>
@@ -31,6 +32,25 @@
         </li>
         <% }) %>
       </ul>
+      <section id="comment-form">
+
+ <!-- #1 -->
+    <% if(currentUser) { %>
+      <% include ../comments/new.ejs %>
+    <% } %>
+   </section>
+
+ <!-- #2 -->
+   <section id="comment-list">
+    <% if(post.comments) { %>
+      <% post.comments.forEach((comment) => { %>
+
+ <!-- #3 -->
+        <%- include("../comments/show.ejs", {comment}) %>
+      <% }) %>
+    <% } %>
+   </section>
+
     </p>
   </main>
 
