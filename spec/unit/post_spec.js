@@ -2,36 +2,42 @@ const sequelize = require("../../src/db/models/index").sequelize;
 const Topic = require("../../src/db/models").Topic;
 const Post = require("../../src/db/models").Post;
 const User = require("../../src/db/models").User;
+const Vote = require("../../src/db/models").Vote;
 
 describe("Post", () => {
   beforeEach(done => {
     this.topic;
     this.post;
     this.user;
+    this.vote;
 
-    sequelize.sync({force: true}).then(response => {
+    sequelize.sync({ force: true }).then(response => {
       User.create({
         email: "starman@tesla.com",
         password: "Trekkie4lyfe"
-      })
-      .then(user => {
+      }).then(user => {
         this.user = user; //store the user
 
-        Topic.create({
-          title: "Expeditions to Alpha Centauri",
-          description: "A compilation of reports from recent visits to the star system.",
-          posts: [{
-            title: "My first visit to Proxima Centauri b",
-            body: "I saw some rocks",
-            userId: this.user.id
-          }]
-        }, {
-          include: {
-            model: Post,
-            as: "posts"
+        Topic.create(
+          {
+            title: "Expeditions to Alpha Centauri",
+            description:
+              "A compilation of reports from recent visits to the star system.",
+            posts: [
+              {
+                title: "My first visit to Proxima Centauri b",
+                body: "I saw some rocks",
+                userId: this.user.id
+              }
+            ]
+          },
+          {
+            include: {
+              model: Post,
+              as: "posts"
+            }
           }
-        })
-        .then(topic => {
+        ).then(topic => {
           this.topic = topic; //store the topic
           this.post = topic.posts[0]; //store the post
           done();
@@ -48,30 +54,32 @@ describe("Post", () => {
         topicId: this.topic.id,
         userId: this.user.id
       })
-      .then(post => {
-        expect(post.title).toBe("Pros of Cryosleep during the long journey");
-        expect(post.body).toBe("1. Not have to answer the 'are were there yet?' question.");
-        expect(post.topicId).toBe(this.topic.id);
-        expect(post.userId).toBe(this.user.id);
-        done();
-      })
-      .catch(error => {
-        console.log(error);
-        done();
-      });
+        .then(post => {
+          expect(post.title).toBe("Pros of Cryosleep during the long journey");
+          expect(post.body).toBe(
+            "1. Not have to answer the 'are were there yet?' question."
+          );
+          expect(post.topicId).toBe(this.topic.id);
+          expect(post.userId).toBe(this.user.id);
+          done();
+        })
+        .catch(error => {
+          console.log(error);
+          done();
+        });
     });
     it("should not create a post with missing title, body, or assigned topic", done => {
       Post.create({
         title: "Pros of Cyrosleep during the long journey"
       })
-      .then(post => {
-        done();
-      })
-      .catch(error => {
-        expect(error.message).toContain("Post.body cannot be null");
-        expect(error.message).toContain("Post.topicId cannot be null");
-        done();
-      });
+        .then(post => {
+          done();
+        })
+        .catch(error => {
+          expect(error.message).toContain("Post.body cannot be null");
+          expect(error.message).toContain("Post.topicId cannot be null");
+          done();
+        });
     });
   });
   describe("#setTopic()", () => {
@@ -79,12 +87,10 @@ describe("Post", () => {
       Topic.create({
         title: "Challenege of interstellar travel",
         description: "1. The Wi-Fi is terrible"
-      })
-      .then(newTopic => {
+      }).then(newTopic => {
         expect(this.post.topicId).toBe(this.topic.id);
 
-        this.post.setTopic(newTopic)
-        .then(post => {
+        this.post.setTopic(newTopic).then(post => {
           expect(post.topicId).toBe(newTopic.id);
           done();
         });
@@ -93,8 +99,7 @@ describe("Post", () => {
   });
   describe("#getTopic()", () => {
     it("should return the associated topic", done => {
-      this.post.getTopic()
-      .then(associatedTopic => {
+      this.post.getTopic().then(associatedTopic => {
         expect(associatedTopic.title).toBe("Expeditions to Alpha Centauri");
         done();
       });
@@ -105,25 +110,72 @@ describe("Post", () => {
       User.create({
         email: "ada@example.com",
         password: "password"
-      })
-      .then(newUser => {
+      }).then(newUser => {
         expect(this.post.userId).toBe(this.user.id);
 
-        this.post.setUser(newUser)
-        .then(post => {
+        this.post.setUser(newUser).then(post => {
           expect(this.post.userId).toBe(newUser.id);
           done();
-        })
-      })
+        });
+      });
     });
   });
   describe("#getUser()", () => {
     it("should return the associated user", done => {
-      this.post.getUser()
-      .then(associatedUser => {
+      this.post.getUser().then(associatedUser => {
         expect(associatedUser.email).toBe("starman@tesla.com");
         done();
-      })
+      });
+    });
+  });
+  describe("#getPoints()", () => {
+    it("should return the point count for the given post", done => {
+      Vote.create({
+        value: 1,
+        postId: this.post.id,
+        userId: this.user.id
+      }).then(vote => {
+        expect(vote.postId).toBe(this.post.id);
+
+        this.post
+          .getPoints()
+          .then(totalPoints => {
+            expect(totalPoints).toBe(1);
+            done();
+          })
+          .catch(err => {
+            console.log(err);
+            done();
+          });
+      });
+    });
+  });
+  describe("#hasUpvoteFor", () => {
+    it("should return true if user with matching id has upvote for the post", done => {
+      Vote.create({
+        value: 1,
+        userId: this.user.id,
+        postId: this.post.id
+      }).then(vote => {
+        this.post.hasUpvoteFor(this.user.id).then(res => {
+          expect(res).toBe(true);
+          done();
+        });
+      });
+    });
+  });
+  describe("#hasDownvoteFor()", () => {
+    it("should return true if a user with matching id has downvote for the post", done => {
+      Vote.create({
+        value: -1,
+        userId: this.user.id,
+        postId: this.post.id
+      }).then(vote => {
+        this.post.hasDownvoteFor(this.user.id).then(res => {
+          expect(res).toBe(true);
+          done();
+        });
+      });
     });
   });
 });

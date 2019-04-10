@@ -110,6 +110,28 @@ describe("Vote", () => {
         });
     });
 
+    it("should not create two votes for a user", done => {
+      Vote.create({
+        value: 1,
+        postId: this.post.id,
+        userId: this.user.id
+      }).then(vote => {
+        Vote.create({
+          value: 1,
+          postId: this.post.id,
+          userId: this.user.id
+        })
+          .then(vote => {
+            expect(vote.value).toBe(1);
+            done();
+          })
+          .catch(err => {
+            console.log(err);
+            done();
+          });
+      });
+    });
+
     // #6
     it("should not create a vote without assigned post or user", done => {
       Vote.create({
@@ -125,6 +147,38 @@ describe("Vote", () => {
         .catch(err => {
           expect(err.message).toContain("Vote.userId cannot be null");
           expect(err.message).toContain("Vote.postId cannot be null");
+          done();
+        });
+    });
+    it("should not create an upvote with a value more than 1", done => {
+      Vote.create({
+        value: 23,
+        postId: this.post.id,
+        userId: this.user.id
+      })
+        .then(vote => {
+          /* Should not execute. Should default to
+        the catch statement */
+          done();
+        })
+        .catch(err => {
+          expect(err.message).toContain("Validation isIn on value failed");
+          done();
+        });
+    });
+    it("should not create a downvote with a value less than -1", done => {
+      Vote.create({
+        value: -23,
+        postId: this.post.id,
+        userId: this.user.id
+      })
+        .then(vote => {
+          /* Should not evaluate. Should default to the
+        catch statement */
+          done();
+        })
+        .catch(err => {
+          expect(err.message).toContain("Validation isIn on value failed");
           done();
         });
     });

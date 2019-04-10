@@ -46,10 +46,12 @@ module.exports = (sequelize, DataTypes) => {
     });
   };
   Post.prototype.getPoints = function() {
-    if (this.votes.length === 0) {
+    const votes = this.getVotes();
+
+    if (votes.length === 0) {
       return 0;
     }
-    return this.votes
+    return votes
       .map(v => {
         return v.value;
       })
@@ -57,5 +59,28 @@ module.exports = (sequelize, DataTypes) => {
         return prev + next;
       });
   };
+  Post.prototype.hasUpvoteFor = function(userId) {
+    return this.getVotes({ where: { userId, postId: this.id, value: 1 } }).then(
+      votes => {
+        if (votes.length > 0) {
+          return true;
+        } else {
+          return false;
+        }
+      }
+    );
+  };
+  Post.prototype.hasDownvoteFor = function(userId) {
+    return this.getVotes({
+      where: { userId, postId: this.id, value: -1 }
+    }).then(votes => {
+      if (votes.length > 0) {
+        return true;
+      } else {
+        return false;
+      }
+    });
+  };
+
   return Post;
 };
